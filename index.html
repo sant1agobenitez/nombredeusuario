@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santiago Benitez</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #fff;
+            color: #000;
+        }
+        header {
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header-img {
+            width: auto;
+            max-height: 200px;
+            margin: 0 auto;
+            display: block;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        h1, h2 {
+            color: #000;
+        }
+        a {
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #gameCanvas {
+            display: block;
+            margin: 20px auto;
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="messi-mundial.jpg" alt="Lionel Messi con la Copa del Mundo" class="header-img">
+        <h1>Santiago Benitez</h1>
+    </header>
+    <div class="content">
+        <div class="section" id="sobre-mi">
+            <h2>Sobre mí</h2>
+            <p>Nací en Asunción, Paraguay en el año 2005. Juego en la primera división del fútbol paraguayo desde los 15 años gracias a mi esfuerzo y voluntad. Vivo solo y me crié con perros y cerdos, ya que mi familia me abandonó cuando tenía 1 año.</p>
+        </div>
+        <div class="section" id="juego">
+            <h2>Juego: Serpiente</h2>
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
+            <p>Usa las teclas de flecha para mover la serpiente.</p>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const grid = 20;
+        let count = 0;
+        let snake = {
+            x: 160,
+            y: 160,
+            dx: grid,
+            dy: 0,
+            cells: [],
+            maxCells: 4
+        };
+        let apple = {
+            x: 320,
+            y: 320
+        };
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function loop() {
+            requestAnimationFrame(loop);
+
+            if (++count < 4) {
+                return;
+            }
+
+            count = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            snake.x += snake.dx;
+            snake.y += snake.dy;
+
+            if (snake.x < 0) {
+                snake.x = canvas.width - grid;
+            } else if (snake.x >= canvas.width) {
+                snake.x = 0;
+            }
+
+            if (snake.y < 0) {
+                snake.y = canvas.height - grid;
+            } else if (snake.y >= canvas.height) {
+                snake.y = 0;
+            }
+
+            snake.cells.unshift({ x: snake.x, y: snake.y });
+
+            if (snake.cells.length > snake.maxCells) {
+                snake.cells.pop();
+            }
+
+            ctx.fillStyle = 'red';
+            ctx.fillRect(apple.x, apple.y, grid - 1, grid - 1);
+
+            ctx.fillStyle = 'black';
+            snake.cells.forEach(function (cell, index) {
+                ctx.fillRect(cell.x, cell.y, grid - 1, grid - 1);
+
+                if (cell.x === apple.x && cell.y === apple.y) {
+                    snake.maxCells++;
+                    apple.x = getRandomInt(0, 25) * grid;
+                    apple.y = getRandomInt(0, 25) * grid;
+                }
+
+                for (let i = index + 1; i < snake.cells.length; i++) {
+                    if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                        snake.x = 160;
+                        snake.y = 160;
+                        snake.cells = [];
+                        snake.maxCells = 4;
+                        snake.dx = grid;
+                        snake.dy = 0;
+
+                        apple.x = getRandomInt(0, 25) * grid;
+                        apple.y = getRandomInt(0, 25) * grid;
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft' && snake.dx === 0) {
+                snake.dx = -grid;
+                snake.dy = 0;
+            } else if (e.key === 'ArrowUp' && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = -grid;
+            } else if (e.key === 'ArrowRight' && snake.dx === 0) {
+                snake.dx = grid;
+                snake.dy = 0;
+            } else if (e.key === 'ArrowDown' && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = grid;
+            }
+        });
+
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>
